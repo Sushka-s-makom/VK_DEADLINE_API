@@ -101,6 +101,45 @@ VK_GROUP_TOKEN=your_vk_group_token
 .venv/bin/python -m scripts.recalculate_pending_jobs
 ```
 
+## Импорт дедлайнов из 100points.ru
+
+Альтернативный источник расписания — платформа 100points.ru. Дедлайны берутся из поля `deadline` каждого урока в курсе.
+
+Настройте `.env`:
+
+```env
+POINTS100_EMAIL=почта@100points.mail
+POINTS100_PASSWORD=пароль
+# Активные курсы физики 2025/2026:
+#   Годовой:       1872  (старт 2025-09-15, конец 2026-06-30)
+#   Годовой+:      2431  (старт 2025-11-10, конец 2026-07-01)
+#   Полугодовой:   2536  (старт 2026-01-13, конец 2026-06-16)
+#   Полугодовой-2: 2753  (старт 2026-02-08, конец 2026-05-16)
+POINTS100_COURSE_IDS=1872,2536
+```
+
+Запустить импорт (только будущие дедлайны):
+
+```bash
+.venv/bin/python -m scripts.import_100points_deadlines
+```
+
+Импортировать все дедлайны, включая прошлые:
+
+```bash
+.venv/bin/python -m scripts.import_100points_deadlines --include-past
+```
+
+Переопределить курсы без правки `.env`:
+
+```bash
+.venv/bin/python -m scripts.import_100points_deadlines --course-ids 2536,2753
+```
+
+Скрипт пропускает курсы, к которым у аккаунта нет доступа (аккаунт должен быть записан в курс как студент). Google Sheets остаётся альтернативным источником.
+
+API 100points.ru: `https://api.100points.ru/api` · авторизация: Bearer JWT · логин: `POST /login` · уроки: `POST /student/courses/{id}/lessons`.
+
 ## Запуск через Docker
 
 Создайте `.env`:
